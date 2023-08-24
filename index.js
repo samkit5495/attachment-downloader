@@ -90,6 +90,12 @@ const defaultBehaviour = (auth, gmail, coredata) => {
             spinner.start()
             return getListOfMailIdByFromId(auth, mailId, 50);
           });
+      } else if (option === 'filter') {
+        return askForFilterValue()
+          .then((filter) => {
+            spinner.start()
+            return getListOfMailIdByFilter(auth, filter, 2000);
+          });
       } else {
         spinner.start()
         return getAllMails(auth, 500)
@@ -218,12 +224,14 @@ function askForFilter(labels) {
       type: 'list',
       name: 'option',
       message: 'How do you like to filter',
-      choices: ['Using from email Id', 'Using label', "All"],
+      choices: ['Using from email Id', 'Using label', "Using Filter", "All"],
       filter: val => {
         if (val === 'Using from email Id') {
           return 'from';
         } else if (val === 'Using label') {
           return 'label';
+        } else if (val === 'Using Filter') {
+          return 'filter';
         } else {
           return 'all'
         }
@@ -242,6 +250,17 @@ function askForMail() {
     }
   ])
     .then(answers => answers.from);
+}
+
+function askForFilterValue() {
+  return inquirer.prompt([
+    {
+      type: 'input',
+      name: 'filter',
+      message: 'Enter filter:'
+    }
+  ])
+    .then(answers => answers.filter);
 }
 
 function getListOfMailIdByLabel(auth, labelId, maxResults = 500, nextPageToken) {
@@ -310,6 +329,24 @@ function getListOfMailIdByFromId(auth, mailId, maxResults = 500) {
       resolve(response.data.messages);
     });
   });
+}
+
+async function getListOfMailIdByFilter(auth, filter, maxResults = 500) {
+  let messages = [];
+  let nextPageToken;
+  do{
+    const response = await gmail.users.messages.list({
+      auth: auth,
+      userId: 'me',
+      q: filter,
+      maxResults: maxResults,
+      pageToken: nextPageToken
+    });
+    nextPageToken = response.data.nextPageToken;
+    messages = messages.concat(response.data.messages);
+    console.log(`Pulled ${messages.length} messages`);
+  } while(nextPageToken);
+  return messages;
 }
 
 async function fetchMailsByMailIds(auth, mailList) {

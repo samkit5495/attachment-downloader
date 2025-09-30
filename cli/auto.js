@@ -7,9 +7,9 @@ const ora = require('ora');
 const yargs = require('yargs/yargs')
 const { hideBin } = require('yargs/helpers')
 
-const AuthFetcher = require('./lib/googleAPIWrapper');
-const FileHelper = require('./lib/fileHelper');
-const GmailHelper = require('./lib/gmail');
+const AuthFetcher = require('../lib/googleAPIWrapper');
+const FileHelper = require('../lib/fileHelper');
+const GmailHelper = require('../lib/gmail');
 const { time } = require('console');
 const mkdirp = require('mkdirp');
 
@@ -29,19 +29,19 @@ String.prototype.replaceAll = function (search, replacement) {
   return target.split(search).join(replacement);
 }
 const argv = yargs(hideBin(process.argv))
-    .option('ext', {
-      type: 'string',
-      description: 'File extention which we want to save'
-    })
-    .option('from', {
-      type: 'string',
-      description: 'Download files only from mail which come from given mail id'
-    })
-    .option('fy', {
-      type: 'boolean',
-      description: 'Financial year wise folder structure'
-    })
-    .argv
+  .option('ext', {
+    type: 'string',
+    description: 'File extention which we want to save'
+  })
+  .option('from', {
+    type: 'string',
+    description: 'Download files only from mail which come from given mail id'
+  })
+  .option('fy', {
+    type: 'boolean',
+    description: 'Financial year wise folder structure'
+  })
+  .argv
 
 const spinner = ora('Reading 1 page');
 AuthFetcher.getAuthAndGmail(main);
@@ -73,7 +73,7 @@ async function workflow(auth, spinner, nextPageToken = null) {
       if (response.token) {
         token = response.token
       }
-        return GmailHelper.fetchMailsByMailIds(gmail, auth, spinner, response.ids);
+      return GmailHelper.fetchMailsByMailIds(gmail, auth, spinner, response.ids);
     })
     .then((mails) => {
       coredata.attachments = pluckAttachments(mails);

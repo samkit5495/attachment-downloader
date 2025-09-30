@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gmail Attachment Downloader</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>📧 Gmail Attachment Downloader</h1>
+            <p>Download attachments from Gmail in bulk with ease</p>
+        </header>
+
+        <div class="main-content">
+
+            <!-- File Selection Section -->
+            <section class="section">
+                <h2>📁 Company File</h2>
+                <div class="file-input-group">
+                    <button id="selectFileBtn" class="btn btn-primary">Select Company File</button>
+                    <span id="selectedFile" class="file-info">No file selected</span>
+                </div>
+                <div id="companyPreview" class="company-preview hidden">
+                    <h3>Companies found:</h3>
+                    <div id="companyList" class="company-list"></div>
+                </div>
+            </section>
+
+            <!-- Date Range Section -->
+            <section class="section">
+                <h2>📅 Date Range</h2>
+                <div class="date-inputs">
+                    <div class="input-group">
+                        <label for="startDate">Start Date:</label>
+                        <input type="date" id="startDate" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="endDate">End Date:</label>
+                        <input type="date" id="endDate" required>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Company Selection Section -->
+            <section class="section">
+                <h2>🏢 Select Companies</h2>
+                <div class="company-selection">
+                    <div class="selection-controls">
+                        <button id="selectAllBtn" class="btn btn-secondary">Select All</button>
+                        <button id="deselectAllBtn" class="btn btn-secondary">Deselect All</button>
+                    </div>
+                    <div id="companyCheckboxes" class="company-checkboxes"></div>
+                </div>
+            </section>
+
+            <!-- Control Section -->
+            <section class="section">
+                <div class="controls">
+                    <button id="startBtn" class="btn btn-success" disabled>Start Download</button>
+                    <button id="stopBtn" class="btn btn-danger hidden">Stop Download</button>
+                    <button id="resetBtn" class="btn btn-warning">Reset State</button>
+                    <button id="openFolderBtn" class="btn btn-secondary">📁 Open Downloads Folder</button>
+                </div>
+            </section>
+
+            <!-- Authorization Section -->
+            <section class="section" id="authSection">
+                <h2>🔐 Google Login</h2>
+                <div id="authStatus" class="auth-status">
+                    <div class="status-message info">Ready to authenticate with Google</div>
+                </div>
+                <div id="authUrlSection" class="auth-url-section hidden">
+                    <p>Please click the button below to authorize this application:</p>
+                    <button id="openAuthBtn" class="btn btn-primary">Login with Google</button>
+                    <div class="auth-url-display">
+                        <label>Or copy this URL to your browser:</label>
+                        <input type="text" id="authUrlInput" readonly>
+                        <button id="copyUrlBtn" class="btn btn-secondary">Copy</button>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- Progress Section -->
+            <section class="section">
+                <div id="progressSection" class="progress-section hidden">
+                    <h2>📊 Download Progress</h2>
+                    <div class="progress-info">
+                        <div id="progressText">Ready to start...</div>
+                        <div class="progress-bar">
+                            <div id="progressFill" class="progress-fill"></div>
+                        </div>
+                        <div id="currentCompany" class="current-company"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Status Section -->
+            <section class="section">
+                <div id="statusSection" class="status-section">
+                    <h2>📝 Status</h2>
+                    <div id="statusMessages" class="status-messages">
+                        <div class="status-message info">Ready to start downloading attachments</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+
+</html>

@@ -5,8 +5,8 @@ const path = require("path");
 const ora = require("ora");
 const XLSX = require("xlsx");
 
-const AuthFetcher = require("./lib/googleAPIWrapper");
-const FileHelper = require("./lib/fileHelper");
+const AuthFetcher = require("../lib/googleAPIWrapper");
+const FileHelper = require("../lib/fileHelper");
 
 let gmail;
 String.prototype.replaceAll = function (search, replacement) {

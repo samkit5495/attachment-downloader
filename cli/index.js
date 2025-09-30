@@ -5,8 +5,8 @@ const inquirer = require("inquirer");
 const path = require("path");
 const ora = require("ora");
 
-const AuthFetcher = require("./lib/googleAPIWrapper");
-const FileHelper = require("./lib/fileHelper");
+const AuthFetcher = require("../lib/googleAPIWrapper");
+const FileHelper = require("../lib/fileHelper");
 const { time } = require("console");
 let pageCounter = 1;
 

@@ -25,6 +25,7 @@ class GmailAttachmentDownloader {
         this.selectedFile = document.getElementById('selectedFile');
         this.companyPreview = document.getElementById('companyPreview');
         this.companyList = document.getElementById('companyList');
+        this.companyCount = document.getElementById('companyCount');
 
         // Download folder selection
         this.selectFolderBtn = document.getElementById('selectFolderBtn');
@@ -38,6 +39,7 @@ class GmailAttachmentDownloader {
         this.selectAllBtn = document.getElementById('selectAllBtn');
         this.deselectAllBtn = document.getElementById('deselectAllBtn');
         this.companyCheckboxes = document.getElementById('companyCheckboxes');
+        this.selectedCount = document.getElementById('selectedCount');
 
         // Controls
         this.startBtn = document.getElementById('startBtn');
@@ -49,6 +51,7 @@ class GmailAttachmentDownloader {
         this.progressSection = document.getElementById('progressSection');
         this.progressText = document.getElementById('progressText');
         this.progressFill = document.getElementById('progressFill');
+        this.progressPercentage = document.getElementById('progressPercentage');
         this.currentCompany = document.getElementById('currentCompany');
 
         // Status
@@ -139,6 +142,11 @@ class GmailAttachmentDownloader {
         this.companyPreview.classList.remove('hidden');
         this.companyList.innerHTML = '';
 
+        // Update company count
+        if (this.companyCount) {
+            this.companyCount.textContent = `${this.companies.length} companies`;
+        }
+
         this.companies.slice(0, 6).forEach(company => {
             const companyItem = document.createElement('div');
             companyItem.className = 'company-item';
@@ -161,6 +169,9 @@ class GmailAttachmentDownloader {
         this.companyCheckboxes.innerHTML = '';
         this.selectedCompanies = [...this.companies.map(c => c.name)]; // Select all by default
 
+        // Update selection count
+        this.updateSelectionCount();
+
         this.companies.forEach(company => {
             const checkboxDiv = document.createElement('div');
             checkboxDiv.className = 'company-checkbox';
@@ -182,6 +193,14 @@ class GmailAttachmentDownloader {
         });
     }
 
+    updateSelectionCount() {
+        if (this.selectedCount) {
+            const count = this.selectedCompanies.length;
+            const total = this.companies.length;
+            this.selectedCount.textContent = `${count} of ${total} selected`;
+        }
+    }
+
     handleCompanySelection(companyName, isSelected) {
         if (isSelected) {
             if (!this.selectedCompanies.includes(companyName)) {
@@ -191,16 +210,25 @@ class GmailAttachmentDownloader {
             this.selectedCompanies = this.selectedCompanies.filter(name => name !== companyName);
         }
 
+        this.updateSelectionCount();
         this.updateStartButtonState();
     }
 
     selectAllCompanies(selectAll) {
         const checkboxes = this.companyCheckboxes.querySelectorAll('input[type="checkbox"]');
 
+        if (selectAll) {
+            this.selectedCompanies = [...this.companies.map(c => c.name)];
+        } else {
+            this.selectedCompanies = [];
+        }
+
         checkboxes.forEach(checkbox => {
             checkbox.checked = selectAll;
-            this.handleCompanySelection(checkbox.value, selectAll);
         });
+
+        this.updateSelectionCount();
+        this.updateStartButtonState();
 
         if (selectAll) {
             this.addStatusMessage('All companies selected', 'info');
@@ -285,7 +313,22 @@ class GmailAttachmentDownloader {
 
         this.progressFill.style.width = `${progress}%`;
         this.progressText.textContent = `Processing ${data.currentCompany + 1} of ${data.totalCompanies} companies`;
-        this.currentCompany.textContent = `Current: ${data.companyName}`;
+
+        // Update percentage display
+        if (this.progressPercentage) {
+            this.progressPercentage.textContent = `${Math.round(progress)}%`;
+        }
+
+        // Update current company with icon
+        this.currentCompany.innerHTML = `
+            <i data-lucide=\"building\"></i>
+            <span>Processing: ${data.companyName}</span>
+        `;
+
+        // Re-initialize Lucide icons for the new content
+        if (window.lucide) {
+            lucide.createIcons();
+        }
 
         this.addStatusMessage(`Processing ${data.companyName}...`, 'info');
     }
@@ -341,13 +384,38 @@ class GmailAttachmentDownloader {
     addStatusMessage(message, type = 'info') {
         const messageElement = document.createElement('div');
         messageElement.className = `status-message ${type}`;
-        messageElement.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+
+        // Get appropriate icon for message type
+        let iconName = 'info';
+        switch (type) {
+            case 'success':
+                iconName = 'check-circle';
+                break;
+            case 'error':
+                iconName = 'alert-circle';
+                break;
+            case 'warning':
+                iconName = 'alert-triangle';
+                break;
+            default:
+                iconName = 'info';
+        }
+
+        messageElement.innerHTML = `
+            <i data-lucide="${iconName}"></i>
+            <span>${new Date().toLocaleTimeString()}: ${message}</span>
+        `;
 
         this.statusMessages.insertBefore(messageElement, this.statusMessages.firstChild);
 
         // Keep only last 10 messages
         while (this.statusMessages.children.length > 10) {
             this.statusMessages.removeChild(this.statusMessages.lastChild);
+        }
+
+        // Re-initialize Lucide icons for the new content
+        if (window.lucide) {
+            lucide.createIcons();
         }
 
         // Auto-scroll to top

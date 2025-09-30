@@ -6,40 +6,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gmail Attachment Downloader</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Lucide Icons for modern iconography -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 
 <body>
     <div class="container">
         <header>
-            <h1>📧 Gmail Attachment Downloader</h1>
-            <p>Download attachments from Gmail in bulk with ease</p>
+            <div class="header-content">
+                <div class="app-icon">
+                    <i data-lucide="mail"></i>
+                </div>
+                <div class="header-text">
+                    <h1>Gmail Attachment Downloader</h1>
+                    <p>Download attachments from Gmail in bulk with enterprise-grade efficiency</p>
+                </div>
+            </div>
         </header>
 
         <div class="main-content">
 
             <!-- File Selection Section -->
             <section class="section">
-                <h2>📁 Company File</h2>
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i data-lucide="file-text"></i>
+                    </div>
+                    <div class="section-title">
+                        <h2>Company File</h2>
+                        <p>Upload a CSV file containing company information</p>
+                    </div>
+                </div>
                 <div class="file-input-group">
-                    <button id="selectFileBtn" class="btn btn-primary">Select Company File</button>
-                    <span id="selectedFile" class="file-info">No file selected</span>
+                    <button id="selectFileBtn" class="btn btn-primary">
+                        <i data-lucide="upload"></i>
+                        Select Company File
+                    </button>
+                    <div class="file-status">
+                        <span id="selectedFile" class="file-info">No file selected</span>
+                    </div>
                 </div>
                 <div id="companyPreview" class="company-preview hidden">
-                    <h3>Companies found:</h3>
+                    <div class="preview-header">
+                        <h3>Companies found</h3>
+                        <div class="company-count" id="companyCount"></div>
+                    </div>
                     <div id="companyList" class="company-list"></div>
                 </div>
             </section>
 
             <!-- Date Range Section -->
             <section class="section">
-                <h2>📅 Date Range</h2>
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i data-lucide="calendar"></i>
+                    </div>
+                    <div class="section-title">
+                        <h2>Date Range</h2>
+                        <p>Specify the date range for attachment search</p>
+                    </div>
+                </div>
                 <div class="date-inputs">
                     <div class="input-group">
-                        <label for="startDate">Start Date:</label>
+                        <label for="startDate">
+                            <i data-lucide="calendar-days"></i>
+                            Start Date
+                        </label>
                         <input type="date" id="startDate" required>
                     </div>
                     <div class="input-group">
-                        <label for="endDate">End Date:</label>
+                        <label for="endDate">
+                            <i data-lucide="calendar-days"></i>
+                            End Date
+                        </label>
                         <input type="date" id="endDate" required>
                     </div>
                 </div>
@@ -47,76 +86,181 @@
 
             <!-- Download Folder Section -->
             <section class="section">
-                <h2>💾 Download Location</h2>
-                <div class="file-input-group">
-                    <button id="selectFolderBtn" class="btn btn-primary">Choose Download Folder</button>
-                    <span id="selectedFolder" class="file-info">Downloads/gmail-attachments (default)</span>
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i data-lucide="folder-down"></i>
+                    </div>
+                    <div class="section-title">
+                        <h2>Download Location</h2>
+                        <p>Choose where to save downloaded attachments</p>
+                    </div>
                 </div>
-                <div class="folder-info">
-                    <small>Files will be organized by company name within this folder</small>
+                <div class="file-input-group">
+                    <button id="selectFolderBtn" class="btn btn-primary">
+                        <i data-lucide="folder-open"></i>
+                        Choose Download Folder
+                    </button>
+                    <div class="file-status">
+                        <span id="selectedFolder" class="file-info">Downloads/gmail-attachments (default)</span>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i data-lucide="info"></i>
+                    </div>
+                    <div class="info-text">
+                        Files will be organized by company name within this folder
+                    </div>
                 </div>
             </section>
 
             <!-- Company Selection Section -->
             <section class="section">
-                <h2>🏢 Select Companies</h2>
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i data-lucide="building-2"></i>
+                    </div>
+                    <div class="section-title">
+                        <h2>Select Companies</h2>
+                        <p>Choose which companies to download attachments from</p>
+                    </div>
+                </div>
                 <div class="company-selection">
                     <div class="selection-controls">
-                        <button id="selectAllBtn" class="btn btn-secondary">Select All</button>
-                        <button id="deselectAllBtn" class="btn btn-secondary">Deselect All</button>
+                        <button id="selectAllBtn" class="btn btn-secondary">
+                            <i data-lucide="check-square"></i>
+                            Select All
+                        </button>
+                        <button id="deselectAllBtn" class="btn btn-secondary">
+                            <i data-lucide="square"></i>
+                            Deselect All
+                        </button>
+                        <div class="selection-count">
+                            <span id="selectedCount">0 selected</span>
+                        </div>
                     </div>
                     <div id="companyCheckboxes" class="company-checkboxes"></div>
                 </div>
             </section>
 
             <!-- Control Section -->
-            <section class="section">
+            <section class="section control-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i data-lucide="settings"></i>
+                    </div>
+                    <div class="section-title">
+                        <h2>Download Control</h2>
+                        <p>Manage your download process</p>
+                    </div>
+                </div>
                 <div class="controls">
-                    <button id="startBtn" class="btn btn-success" disabled>Start Download</button>
-                    <button id="stopBtn" class="btn btn-danger hidden">Stop Download</button>
-                    <button id="resetBtn" class="btn btn-warning">Reset State</button>
-                    <button id="openFolderBtn" class="btn btn-secondary">📁 Open Downloads Folder</button>
+                    <button id="startBtn" class="btn btn-success btn-large" disabled>
+                        <i data-lucide="play"></i>
+                        Start Download
+                    </button>
+                    <button id="stopBtn" class="btn btn-danger btn-large hidden">
+                        <i data-lucide="stop-circle"></i>
+                        Stop Download
+                    </button>
+                    <button id="resetBtn" class="btn btn-warning">
+                        <i data-lucide="refresh-cw"></i>
+                        Reset State
+                    </button>
+                    <button id="openFolderBtn" class="btn btn-secondary">
+                        <i data-lucide="folder-open"></i>
+                        Open Downloads Folder
+                    </button>
                 </div>
             </section>
 
             <!-- Authorization Section -->
-            <section class="section" id="authSection">
-                <h2>🔐 Google Login</h2>
+            <section class="section auth-section" id="authSection">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i data-lucide="shield-check"></i>
+                    </div>
+                    <div class="section-title">
+                        <h2>Google Authentication</h2>
+                        <p>Connect securely to your Google account</p>
+                    </div>
+                </div>
                 <div id="authStatus" class="auth-status">
-                    <div class="status-message info">Ready to authenticate with Google</div>
+                    <div class="status-message info">
+                        <i data-lucide="info"></i>
+                        Ready to authenticate with Google
+                    </div>
                 </div>
                 <div id="authUrlSection" class="auth-url-section hidden">
-                    <p>Please click the button below to authorize this application:</p>
-                    <button id="openAuthBtn" class="btn btn-primary">Login with Google</button>
+                    <div class="auth-prompt">
+                        <p>Please click the button below to authorize this application:</p>
+                        <button id="openAuthBtn" class="btn btn-primary btn-large">
+                            <i data-lucide="log-in"></i>
+                            Login with Google
+                        </button>
+                    </div>
                     <div class="auth-url-display">
-                        <label>Or copy this URL to your browser:</label>
-                        <input type="text" id="authUrlInput" readonly>
-                        <button id="copyUrlBtn" class="btn btn-secondary">Copy</button>
+                        <label>
+                            <i data-lucide="link"></i>
+                            Or copy this URL to your browser:
+                        </label>
+                        <div class="url-input-group">
+                            <input type="text" id="authUrlInput" readonly>
+                            <button id="copyUrlBtn" class="btn btn-secondary">
+                                <i data-lucide="copy"></i>
+                                Copy
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
 
 
             <!-- Progress Section -->
-            <section class="section">
-                <div id="progressSection" class="progress-section hidden">
-                    <h2>📊 Download Progress</h2>
+            <section class="section progress-section">
+                <div id="progressSection" class="progress-content hidden">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <i data-lucide="bar-chart-3"></i>
+                        </div>
+                        <div class="section-title">
+                            <h2>Download Progress</h2>
+                            <p>Track your download progress in real-time</p>
+                        </div>
+                    </div>
                     <div class="progress-info">
-                        <div id="progressText">Ready to start...</div>
+                        <div class="progress-stats">
+                            <div id="progressText" class="progress-text">Ready to start...</div>
+                            <div class="progress-percentage" id="progressPercentage">0%</div>
+                        </div>
                         <div class="progress-bar">
                             <div id="progressFill" class="progress-fill"></div>
                         </div>
-                        <div id="currentCompany" class="current-company"></div>
+                        <div id="currentCompany" class="current-company">
+                            <i data-lucide="building"></i>
+                            <span>Waiting to start...</span>
+                        </div>
                     </div>
                 </div>
             </section>
 
             <!-- Status Section -->
-            <section class="section">
-                <div id="statusSection" class="status-section">
-                    <h2>📝 Status</h2>
+            <section class="section status-section">
+                <div id="statusSection" class="status-content">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <i data-lucide="activity"></i>
+                        </div>
+                        <div class="section-title">
+                            <h2>Activity Log</h2>
+                            <p>Monitor the download process and any issues</p>
+                        </div>
+                    </div>
                     <div id="statusMessages" class="status-messages">
-                        <div class="status-message info">Ready to start downloading attachments</div>
+                        <div class="status-message info">
+                            <i data-lucide="check-circle"></i>
+                            <span>Ready to start downloading attachments</span>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -124,6 +268,12 @@
     </div>
 
     <script src="renderer.js"></script>
+    <script>
+        // Initialize Lucide icons after DOM is loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            lucide.createIcons();
+        });
+    </script>
 </body>
 
 </html>

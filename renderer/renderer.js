@@ -3,12 +3,14 @@ class GmailAttachmentDownloader {
         this.companies = [];
         this.selectedCompanies = [];
         this.companyFilePath = '';
+        this.downloadFolder = '';
         this.isDownloading = false;
 
         this.initializeElements();
         this.attachEventListeners();
         this.setupProgressListeners();
         this.setDefaultDates();
+        this.setDefaultDownloadFolder();
     } initializeElements() {
         // Authorization
         this.authSection = document.getElementById('authSection');
@@ -23,6 +25,10 @@ class GmailAttachmentDownloader {
         this.selectedFile = document.getElementById('selectedFile');
         this.companyPreview = document.getElementById('companyPreview');
         this.companyList = document.getElementById('companyList');
+
+        // Download folder selection
+        this.selectFolderBtn = document.getElementById('selectFolderBtn');
+        this.selectedFolder = document.getElementById('selectedFolder');
 
         // Date inputs
         this.startDate = document.getElementById('startDate');
@@ -55,6 +61,7 @@ class GmailAttachmentDownloader {
         this.copyUrlBtn.addEventListener('click', () => this.copyAuthUrl());
 
         this.selectFileBtn.addEventListener('click', () => this.selectCompanyFile());
+        this.selectFolderBtn.addEventListener('click', () => this.selectDownloadFolder());
         this.selectAllBtn.addEventListener('click', () => this.selectAllCompanies(true));
         this.deselectAllBtn.addEventListener('click', () => this.selectAllCompanies(false));
         this.startBtn.addEventListener('click', () => this.startDownload());
@@ -239,7 +246,8 @@ class GmailAttachmentDownloader {
                 companyFile: this.companyFilePath,
                 startDate: startDateFormatted,
                 endDate: endDateFormatted,
-                selectedCompanies: this.selectedCompanies
+                selectedCompanies: this.selectedCompanies,
+                downloadFolder: this.downloadFolder
             });
 
             if (result.success) {
@@ -417,7 +425,7 @@ class GmailAttachmentDownloader {
     async openDownloadsFolder() {
         try {
             this.addStatusMessage('Opening downloads folder...', 'info');
-            const result = await window.electronAPI.openDownloadsFolder();
+            const result = await window.electronAPI.openDownloadsFolder(this.downloadFolder);
 
             if (result.success) {
                 this.addStatusMessage('Downloads folder opened successfully', 'success');
@@ -428,6 +436,43 @@ class GmailAttachmentDownloader {
             console.error('Failed to open downloads folder:', error);
             this.addStatusMessage('Failed to open downloads folder', 'error');
         }
+    } async setDefaultDownloadFolder() {
+        try {
+            const result = await window.electronAPI.getDefaultDownloadFolder();
+            if (result.success) {
+                this.downloadFolder = result.folderPath;
+                this.selectedFolder.textContent = this.getDisplayPath(result.folderPath);
+                this.addStatusMessage('Default download folder set', 'info');
+            }
+        } catch (error) {
+            console.error('Failed to get default download folder:', error);
+            this.downloadFolder = '';
+        }
+    }
+
+    async selectDownloadFolder() {
+        try {
+            const result = await window.electronAPI.selectDownloadFolder();
+            if (result.success) {
+                this.downloadFolder = result.folderPath;
+                this.selectedFolder.textContent = this.getDisplayPath(result.folderPath);
+                this.addStatusMessage(`Download folder changed to: ${this.getDisplayPath(result.folderPath)}`, 'success');
+            } else {
+                this.addStatusMessage('No folder selected', 'warning');
+            }
+        } catch (error) {
+            console.error('Failed to select download folder:', error);
+            this.addStatusMessage('Failed to select download folder', 'error');
+        }
+    }
+
+    getDisplayPath(fullPath) {
+        // Show a shortened version of the path for better UI
+        const parts = fullPath.split('/');
+        if (parts.length > 3) {
+            return `.../${parts.slice(-3).join('/')}`;
+        }
+        return fullPath;
     }
 }
 

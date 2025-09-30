@@ -63,3 +63,4 @@ credentials.json
 .DS_Store
 
 input/*
+dist

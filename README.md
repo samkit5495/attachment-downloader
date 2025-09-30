@@ -96,6 +96,35 @@ Create an Excel file with columns:
 - `name`: Company name
 - `email`: Company email address
 
+## 🏗️ Building Executables
+
+### Windows Executable
+
+```bash
+# Build Windows installer and portable executable
+npm run build-win
+```
+
+This creates:
+
+- **Installer**: `dist/Gmail Attachment Downloader Setup x.x.x.exe`
+- **Portable**: `dist/Gmail Attachment Downloader x.x.x.exe`
+
+### Other Platforms
+
+```bash
+# Build for macOS (requires macOS)
+npm run build-mac
+
+# Build for Linux
+npm run build-linux
+
+# Build for all platforms
+npm run build
+```
+
+📋 See [BUILD.md](BUILD.md) for detailed build instructions and troubleshooting.
+
 ## Contributors
 
 Thanks to all the people who already contributed!

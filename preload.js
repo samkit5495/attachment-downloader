@@ -2,11 +2,13 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
     selectCompanyFile: () => ipcRenderer.invoke('select-company-file'),
+    selectDownloadFolder: () => ipcRenderer.invoke('select-download-folder'),
+    getDefaultDownloadFolder: () => ipcRenderer.invoke('get-default-download-folder'),
     startDownload: (data) => ipcRenderer.invoke('start-download', data),
     getDownloadStatus: () => ipcRenderer.invoke('get-download-status'),
     stopDownload: () => ipcRenderer.invoke('stop-download'),
     resetDownloadState: () => ipcRenderer.invoke('reset-download-state'),
-    openDownloadsFolder: () => ipcRenderer.invoke('open-downloads-folder'),
+    openDownloadsFolder: (folderPath) => ipcRenderer.invoke('open-downloads-folder', folderPath),
     openAuthUrl: (url) => ipcRenderer.invoke('open-auth-url', url),    // Listen to download progress
     onDownloadProgress: (callback) => {
         ipcRenderer.on('download-progress', (event, data) => callback(data));

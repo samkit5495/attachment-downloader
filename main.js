@@ -91,7 +91,39 @@ ipcMain.handle('select-company-file', async () => {
     return { success: false, error: 'No file selected' };
 });
 
-ipcMain.handle('start-download', async (event, { companyFile, startDate, endDate, selectedCompanies }) => {
+ipcMain.handle('select-download-folder', async () => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+        properties: ['openDirectory']
+    });
+
+    if (!result.canceled && result.filePaths.length > 0) {
+        return { success: true, folderPath: result.filePaths[0] };
+    }
+
+    return { success: false, error: 'No folder selected' };
+});
+
+ipcMain.handle('get-default-download-folder', async () => {
+    const os = require('os');
+    const defaultPath = path.join(os.homedir(), 'Downloads', 'gmail-attachments');
+
+    // Create the folder if it doesn't exist
+    try {
+        if (!fs.existsSync(defaultPath)) {
+            fs.mkdirSync(defaultPath, { recursive: true });
+        }
+        return { success: true, folderPath: defaultPath };
+    } catch (error) {
+        // Fallback to current directory if Downloads folder is not accessible
+        const fallbackPath = path.join(__dirname, 'files');
+        if (!fs.existsSync(fallbackPath)) {
+            fs.mkdirSync(fallbackPath, { recursive: true });
+        }
+        return { success: true, folderPath: fallbackPath };
+    }
+});
+
+ipcMain.handle('start-download', async (event, { companyFile, startDate, endDate, selectedCompanies, downloadFolder }) => {
     try {
         if (downloadProcess) {
             console.log(downloadProcess);
@@ -107,6 +139,7 @@ ipcMain.handle('start-download', async (event, { companyFile, startDate, endDate
             companies: filteredCompanies,
             startDate,
             endDate,
+            downloadFolder: downloadFolder || path.join(__dirname, 'files'),
             currentCompany: 0,
             totalCompanies: filteredCompanies.length,
             status: 'starting'
@@ -171,10 +204,22 @@ ipcMain.handle('reset-download-state', () => {
     return { success: true, message: 'Download state reset' };
 });
 
-ipcMain.handle('open-downloads-folder', async () => {
+ipcMain.handle('open-downloads-folder', async (event, folderPath) => {
     try {
-        const downloadsPath = path.join(__dirname, 'files');
-        await shell.openPath(downloadsPath);
+        // Use provided folder path or default to the most recent download folder
+        let pathToOpen = folderPath;
+
+        if (!pathToOpen) {
+            if (downloadProcess && downloadProcess.downloadFolder) {
+                pathToOpen = downloadProcess.downloadFolder;
+            } else {
+                // Get default folder
+                const os = require('os');
+                pathToOpen = path.join(os.homedir(), 'Downloads', 'gmail-attachments');
+            }
+        }
+
+        await shell.openPath(pathToOpen);
         return { success: true };
     } catch (error) {
         return { success: false, error: error.message };
@@ -213,13 +258,13 @@ async function processDownload(auth, gmailInstance, process) {
                 status: process.status
             });
 
-            await processCompany(process.companies[i], auth, gmailInstance, process.startDate, process.endDate);
+            await processCompany(process.companies[i], auth, gmailInstance, process.startDate, process.endDate, process.downloadFolder);
         }
 
         process.status = 'completed';
 
         // Open the downloads folder automatically
-        const downloadsPath = path.join(__dirname, 'files');
+        const downloadsPath = process.downloadFolder;
         shell.openPath(downloadsPath).catch(err => {
             console.log('Could not open downloads folder:', err.message);
         });

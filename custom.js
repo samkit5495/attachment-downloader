@@ -3,6 +3,7 @@ const atob = require("atob");
 const fs = require("fs");
 const path = require("path");
 const ora = require("ora");
+const XLSX = require("xlsx");
 
 const AuthFetcher = require("./lib/googleAPIWrapper");
 const FileHelper = require("./lib/fileHelper");
@@ -13,9 +14,9 @@ String.prototype.replaceAll = function (search, replacement) {
   return target.split(search).join(replacement);
 };
 
-if (process.argv.length != 4) {
-  console.error(`This file expects start and end date in args
-  e.g. node custom.js <start_date> <end_date>`);
+if (process.argv.length != 5) {
+  console.error(`This file expects company file, start date and end date in args
+  e.g. node custom.js <company_file> <start_date> <end_date>`);
   process.exit(0);
 }
 
@@ -64,6 +65,7 @@ function fetchAndSaveAttachment(auth, attachment, folderName) {
         if (!response) {
           console.log("Empty response: " + response);
           reject(response);
+          return;
         }
         var data = response.data.data.replaceAll("-", "+");
         data = data.replaceAll("_", "/");
@@ -191,7 +193,23 @@ function fixBase64(binaryData) {
   return view;
 }
 
-const companies = JSON.parse(fs.readFileSync("companies.json"));
+function readCompanyFile(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+
+  if (ext === '.json') {
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } else if (ext === '.xlsx' || ext === '.xls') {
+    const workbook = XLSX.readFile(filePath);
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+    return XLSX.utils.sheet_to_json(worksheet);
+  } else {
+    throw new Error(`Unsupported file format: ${ext}. Please use .json, .xlsx, or .xls files.`);
+  }
+}
+
+const companyFile = process.argv[2];
+const companies = readCompanyFile(companyFile);
 
 spinner.start();
 
@@ -211,7 +229,7 @@ async function processCompany(company, auth) {
   }
   let coredata = {};
   spinner.text = `processing ${company.name} `;
-  coredata.mailList = await getListOfMailIdByFilter(auth, `from:(${company.email}) after:${process.argv[2]} before:${process.argv[3]}`, 2000);
+  coredata.mailList = await getListOfMailIdByFilter(auth, `from:(${company.email}) after:${process.argv[3]} before:${process.argv[4]}`, 2000);
   const mails = await fetchMailsByMailIds(auth, coredata.mailList);
   coredata.attachments = pluckAllAttachments(mails);
   await fetchAndSaveAttachments(auth, coredata.attachments, company.name);

@@ -62,4 +62,4 @@ credentials.json
 
 .DS_Store
 
-companies.json
+input/*
